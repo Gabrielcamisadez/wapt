@@ -1,0 +1,62 @@
+                      ━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                       AUTOMATED SQL WITH SQLMAP
+
+                                gabriel
+                      ━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
+Table of Contents
+─────────────────
+
+1. Initial usage
+
+
+SQLMap is an open source penetration testing tool that automates the
+process of detecting and exploiting SQL injection flaws and taking over
+of database servers.
+
+It comes with a powerful detection engine, many niche features for the
+ultimate penetration tester and a broad range of switches lasting from
+database fingerprinting.
+
+documentation -><https://github.com/sqlmapproject/sqlmap/wiki>
+
+
+1 Initial usage
+═══════════════
+
+  BUrp facilitates the process of taking the vulnerable URL, by clicking
+  the right button and copy to file or just copy the text.
+
+  Copy to file is the easiest way to do this ->
+
+  ┌────
+  │ sqlmap -vv -r request.txt
+  └────
+
+  This will already work, the sqlmap has many more features and methods
+  to do the automated exploration.
+
+  ┌────
+  │ sqlmap -vv -r request.txt --dump
+  └────
+
+  SQLMap also works with levels and risk levels, this can be defined
+  with that parameters ->
+
+  –level=
+
+  –risk=
+
+  ┌────
+  │ sqlmap -vv -r request.txt --level=5 --risk=4
+  └────
+
+             ___ __H__ ___ ___[.]_____ ___ ___ {1.8.4#stable}
+  ━━━━━━━━━━━━━━━━━━━━━━━
+   _ -    . [.]    .’  . 
+   __  _  _  [,]_  _   _  __,  _ 
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
+  Usage: python3 sqlmap [options]
