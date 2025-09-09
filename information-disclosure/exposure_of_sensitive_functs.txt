@@ -68,5 +68,5 @@ Table of Contents
   │ Content-Type: application/json
   │ Content-Length: 53
   │ 
-  │ {"UserName": "lio@email.com", "Password": "password"}
+  │ {"UserName": "biel@email.com", "Password": "password"}
   └────
