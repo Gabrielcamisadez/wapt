@@ -8,7 +8,7 @@
 Table of Contents
 ─────────────────
 
-1. source pages review
+1. source code pages review
 2. send a POST request to this endpoint to creat Admin account
 
 
