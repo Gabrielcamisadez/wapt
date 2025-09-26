@@ -1,0 +1,115 @@
+#+title: Api Beginner
+#+author: gabriel
+#+description: insiderPhD
+
+* What is an API ?
+
+A type of web applications that is designed for other applications to interact with it rather than humans
+
+This might be intentionally as a way to provide 3* party apps
+
+Or just for a single application
+
+Developers can write a single API and reuse that code for a mobile app, a desktop app, website etc,,,
+
+* json intro
+
+Json is a way to represent data in text format, it starts and end with a curly brace {}.
+
+Json contains objects which are denoted with {} and arrays/lists [], whitin these you have key-value pairs which store the data
+
+It's important to become familiar with reading JSON so take the time to learn
+
+* main api types
+
+ * RESTful -> used to standing something, representate a state transfer, by far the most common type
+
+ * Batched -> instead of sending the API request itself, you actually embed a bunch of requests into a single JSON, most common with mobile applications
+
+ * GraphQL -> instead of defining CRUD endpoints, have a single location and you have whoever is acessing tha API write queries, like SQL
+
+ * SOAP -> primarily used by legacy applications, uses XML instead of JSON
+
+* RESFful && CRUD
+
+RESTful API has always five different routes per resource, they have a defined structure which relates to CRUD functionality
+
+You can easy predict new endpoints simply by knowing an application, they are widely used, however some of the endpoints may be more custom, they usually return JSON
+
+Certainly just because an API is undocumented doesn't mean that it's not an API,
+
+Can be challenging to enumerate, we need to guess the resources names
+- use webcontent/api-endpoints wordlists like
+- custom resource names with wordlists too
+
+* some stages
+
+ * find endpoinst
+   - recon is probably one of the most challenging things about API hacking but tou don't need to find everything
+ * test for issues between API
+   - don't overcomplicate things initially, still do litmus tests for xss, sqli etc...
+   - verify the WAF existence
+ * test for API specific bugs
+   - always test an API for access control issues, they are the most common API bugs
+ * escalate
+   - the most common critical issue is the account takeovers after find a bug chains
+
+* clicking buttons
+
+A nice way  to discover APIs
+
+notes like ->
+
+| method | api endpoint | BOLA | Information Disclo | BFLA | Priv escalation | Business Logic |
+                                    |    X     |
+
+* owasp API top 10
+
+- Broken Object Level Authorization
+- Broken Authentication
+- Broken Object Property Level Authorization
+- Unrestricted Resource Consupmtion
+- Broken Function Level Authorization
+- Unrestricted Access to Sensitive Business Flows
+- Server Side Request Forgery
+- Security MIsconfiguration
+- Improper Inventory Management
+- Unsafe consumption of APIs
+
+* access control 3 different ways
+
+*Object* ->
+Being able to edit a object that does not belong to you, usually because any authorization check is missing and really common in generated APIs
+
+*Property* ->
+Think things that require additional information, need current password to change your password, usually you see this as info disclosure
+
+*Permissions* ->
+Common with complex hierarchies of tenancy applications, can be horizontal and vertical
+
+* initial basic cookie manipulation
+
+Create an account and log in, perform a bunch of requests in application, with burp get some of these requests and remove the entire cookie or a little parts of then
+
+Check and see if they're caused something to happen to our account
+
+*authorization check*
+
+1. Create an account and log in
+2. Perform a bunch of requests again
+3. Create another account and log in
+4. Go to repeater and change the cookies between the 2 created accounts
+5. Check and see if they've caused something to happen to account A rather than B
+
+Another great tool to study and use -> *PwnFox*
+
+* information disclosure
+
+PII -> Personal Identifiable Information
+Access Control Issues that allow read access
+Error messages and Software Disclosure
+Comments, API keys, public information etc....
+
+* integrations and business logis
+
+Integrations are great places to find business logic issues, often between 3rd party APIs.
