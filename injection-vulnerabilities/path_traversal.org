@@ -1,0 +1,7 @@
+#+title: Path Traversal
+#+author: gabriel
+
+* intro
+Durante a navegação dentro da aplicação web secure-bank em busca de possíveis falhas, foi descoberto um outro ponto que pode ser considerado critíco para uma aplicação pela exposição dos dados que podem ser atingidos.
+
+Durante o carregamento da página http://localhost:1337/Transaction algumas outras requests são realizadas, e isto é possível analisar com o burp ->
