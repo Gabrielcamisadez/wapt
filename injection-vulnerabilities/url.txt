@@ -1,0 +1,17 @@
+GET /api/Transaction/GetTransactions?&length=10&search%5Bvalue%5D=%27&_=1758931600184 HTTP/1.1
+Host: localhost:1337
+sec-ch-ua-platform: "Linux"
+X-Requested-With: XMLHttpRequest
+Accept-Language: en-US,en;q=0.9
+Accept: application/json, text/javascript, */*; q=0.01
+sec-ch-ua: "Chromium";v="139", "Not;A=Brand";v="99"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36
+sec-ch-ua-mobile: ?0
+Sec-Fetch-Site: same-origin
+Sec-Fetch-Mode: cors
+Sec-Fetch-Dest: empty
+Referer: http://localhost:1337/Transaction
+Accept-Encoding: gzip, deflate, br
+Cookie: SessionId=YmllbEBtYWlsLmNvbQ%3D%3D%26edc37d56da33d462488eecca32d4f6b91688b418e99fe62afa4476bdf08cc310%260
+Connection: keep-alive
+
