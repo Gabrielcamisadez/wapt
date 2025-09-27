@@ -16,3 +16,6 @@ A primeira request possui a vulnerabilidade, ela permita que o atacante manipule
 
 
 [[./imgs/traversal_request.png]]
+
+
+[[./imgs/stormtrooper.png]]
