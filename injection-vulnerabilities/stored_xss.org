@@ -6,7 +6,7 @@ On the transactions page there is a functionality to create another transactions
 It is possible to inject an XSS payload within the "REason" field of the "Receiver" field. THis will be stored in the database, and executed in the next page refresh.
 
 
-* tests at creation form
+* test input form
 
 First classical JS payload ->
 #+begin_src sh
