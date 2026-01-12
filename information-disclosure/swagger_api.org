@@ -1,11 +1,23 @@
 #+title: Exposed Swagger API
 #+author: Gabriel
 
+** CVSS explain
+- Attack Vector N (Network)
+- Attack Complexity L (Low)
+- Privileges Required N (None)
+- User Interaction N (None)
+- Scope U (Unchanged)
+- Confidentiality L (Low)
+- Integrity N (None)
+- Availability N (None)
+  
 * Information Disclosure
 
 ** Swager API Exposed
 
 :PROPERTIES:
+
+
 
 :CVSS:    CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N
 
